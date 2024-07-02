@@ -1,117 +1,91 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, {useState} from 'react';
+import {View, TextInput, Button, Text, StyleSheet} from 'react-native';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+const App = () => {
+  const [inputNumber, setInputNumber] = useState('');
+  const [isPrime, setIsPrime] = useState<any>(null);
+  const [timeTaken, setTimeTaken] = useState(0);
+  const [submit, setSubmit] = useState(false);
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+  const checkPrime = (inputNumber: number) => {
+    if (inputNumber <= 1) {
+      return false;
+    }
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+    for (let i = 2; i < inputNumber; i++) {
+      if (inputNumber % i === 0) {
+        return false;
+      }
+    }
+    return true;
+  };
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+  const handleCheckPrime = () => {
+    const num = parseInt(inputNumber);
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+    if (isNaN(num)) {
+      setIsPrime(null);
+      setTimeTaken(0);
+      return;
+    }
+    const startTime = performance.now();
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    const primeResult = checkPrime(num);
+    const endTime = performance.now();
+
+    setIsPrime(primeResult);
+    setTimeTaken(endTime - startTime);
+    setSubmit(true);
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
+    <View style={styles.container}>
+      <TextInput
+        style={styles.input}
+        keyboardType="numeric"
+        placeholder="Enter a number"
+        value={inputNumber}
+        onChangeText={e => {
+          setSubmit(false);
+          setInputNumber(e);
+          setTimeTaken(0);
+        }}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      <Button
+        title="Check Prime"
+        onPress={handleCheckPrime}
+        disabled={inputNumber === ''}
+      />
+      {submit && (
+        <Text style={styles.result}>
+          {inputNumber} is {isPrime ? 'a Prime number' : 'not a Prime number'}.
+        </Text>
+      )}
+
+      <Text style={styles.result}>Time taken: {timeTaken} ms</Text>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    width: '80%',
+    marginBottom: 20,
+    paddingHorizontal: 10,
   },
-  sectionDescription: {
-    marginTop: 8,
+  result: {
+    marginTop: 20,
     fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
   },
 });
 
